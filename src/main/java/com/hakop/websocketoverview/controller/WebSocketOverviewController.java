@@ -1,6 +1,7 @@
 package com.hakop.websocketoverview.controller;
 
 import com.hakop.websocketoverview.model.RegInfo;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -19,6 +20,12 @@ public class WebSocketOverviewController {
     @MessageMapping("register/body")
     @SendTo("/topic/process")
     public String registerInBody(@Payload RegInfo regInfo) {
-        return String.format("%s you are registered.", regInfo.name());
+        return String.format("%s you are registered by body.", regInfo.name());
+    }
+
+    @MessageMapping("register/{name}/param")
+    @SendTo("/queue/process")
+    public String registerInParam(@DestinationVariable String name) {
+        return String.format("%s you are registered by query param.", name);
     }
 }

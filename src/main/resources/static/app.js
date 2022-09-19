@@ -17,6 +17,9 @@ function connect() {
         stompClient.subscribe('/topic/process', function (regProcessInfo) {
             showRegProcessInfo(regProcessInfo.body);
         });
+        stompClient.subscribe('/queue/process', function (regProcessInfo) {
+            showRegProcessInfo(regProcessInfo.body);
+        });
     });
 }
 
@@ -36,12 +39,16 @@ function sendNameInBody() {
     stompClient.send("/app/register/body", {}, JSON.stringify({'name': $("#name").val()}));
 }
 
+function sendNameInParam() {
+    stompClient.send("/app/register/" + $("#name").val() + "/param");
+}
+
 $(function () {
-    $("form").on('submit', function (e) {
-        e.preventDefault();
-    });
-    $( "#connect" ).click(function() { connect(); });
+    $("form").on('submit', function (e) { e.preventDefault(); });
+
+    $("#connect").click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
 
     $( "#send_in_body" ).click(function() { sendNameInBody(); });
+    $( "#send_in_param" ).click(function() { sendNameInParam(); });
 });

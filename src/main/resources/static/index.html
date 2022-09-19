@@ -14,7 +14,7 @@
     enabled. Please enable Javascript and reload this page!</h2></noscript>
 <div id="main-content" class="container">
     <h2>WebSocket overview</h2>
-    <div class="row" style="padding-top: 20px">
+    <div class="row" style="padding-top: 25px">
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
@@ -24,6 +24,36 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 25px">
+        <div class="col-md-6" style="display: inline-block">
+            <form class="form-inline">
+                <div class="form-group">
+                    <button id="send_in_body" class="my-button btn btn-default" type="submit">Send in Body</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="name" style="padding-right: 5px">What is your name?</label>
+                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 25px">
+        <div class="col-md-12">
+            <table id="process_request" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Process request.</th>
+                </tr>
+                </thead>
+                <tbody id="process">
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

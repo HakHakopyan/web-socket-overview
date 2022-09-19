@@ -11,6 +11,8 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
+
+        stompClient.subscribe('/app/ping', function (response) {});
     });
 }
 

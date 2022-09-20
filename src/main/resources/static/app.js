@@ -3,6 +3,15 @@ var stompClient = null;
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
     $("#disconnect").prop("disabled", !connected);
+    if (connected) {
+        $("#process_request").show();
+        $("#request_error").show();
+    } else {
+        $("#process_request").hide();
+        $("#request_error").hide();
+    }
+    $("#process").html("");
+    $("#error").html("");
 }
 
 function connect() {
@@ -19,6 +28,9 @@ function connect() {
         });
         stompClient.subscribe('/queue/process', function (regProcessInfo) {
             showRegProcessInfo(regProcessInfo.body);
+        });
+        stompClient.subscribe('/queue/error', function (message) {
+            $("#error").append("<tr><td>" + message.body + "</td></tr>");
         });
     });
 }
@@ -47,8 +59,8 @@ $(function () {
     $("form").on('submit', function (e) { e.preventDefault(); });
 
     $("#connect").click(function() { connect(); });
-    $( "#disconnect" ).click(function() { disconnect(); });
+    $("#disconnect").click(function() { disconnect(); });
 
-    $( "#send_in_body" ).click(function() { sendNameInBody(); });
-    $( "#send_in_param" ).click(function() { sendNameInParam(); });
+    $("#send_in_body").click(function() { sendNameInBody(); });
+    $("#send_in_param").click(function() { sendNameInParam(); });
 });

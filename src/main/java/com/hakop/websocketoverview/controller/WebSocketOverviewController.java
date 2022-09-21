@@ -9,7 +9,10 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WebSocketOverviewController {
 
     private final SocketCache socketCache;
+    private final SimpMessageSendingOperations msTemplate;
 
     @SubscribeMapping("/ping")
     public String sendOneTimeMessage(@Header("simpSessionId") String sessionId) {
@@ -26,14 +30,14 @@ public class WebSocketOverviewController {
     @MessageMapping("register/body")
     @SendTo("/topic/process")
     public String registerInBody(@Payload RegInfo regInfo, @Header("simpSessionId") String sessionId) {
-        saveUser(regInfo.name(), sessionId);
+        socketCache.add(sessionId, regInfo.name());
         return String.format("%s you are registered by 'body' in session %s.", regInfo.name(), sessionId);
     }
 
     @MessageMapping("register/{name}/param")
     @SendTo("/queue/process")
     public String registerInParam(@DestinationVariable String name, @Header("simpSessionId") String sessionId) {
-        saveUser(name, sessionId);
+        socketCache.add(sessionId, name);
         return String.format("%s you are registered by 'query param' in session %s.", name, sessionId);
     }
 
@@ -43,12 +47,14 @@ public class WebSocketOverviewController {
         return exception.getMessage();
     }
 
-    private void saveUser(String userName, String sessionId) throws IllegalArgumentException {
-        boolean isAdded = socketCache.add(sessionId, userName);
-        if (!isAdded) {
-            throw new IllegalArgumentException(
-                    String.format("User '%s' already registered in session %s", userName, sessionId)
-            );
-        }
+    @PostMapping("/result")
+    public String result(@RequestParam("user_name") final String userName, @RequestParam("result") final boolean result) {
+        msTemplate.convertAndSend("/topic/answer", String.format("%s your registration result is: %s",
+                userName,
+                result ? "success" : "denied"
+        ));
+        return socketCache.removeByUserName(userName)
+                ? "User success notified."
+                : "Such user not registered";
     }
 }

@@ -5,12 +5,15 @@ function setConnected(connected) {
     $("#disconnect").prop("disabled", !connected);
     if (connected) {
         $("#process_request").show();
+        $("#request_answer").show();
         $("#request_error").show();
     } else {
         $("#process_request").hide();
+        $("#request_answer").hide();
         $("#request_error").hide();
     }
     $("#process").html("");
+    $("#answer").html("");
     $("#error").html("");
 }
 
@@ -28,6 +31,9 @@ function connect() {
         });
         stompClient.subscribe('/queue/process', function (regProcessInfo) {
             showRegProcessInfo(regProcessInfo.body);
+        });
+        stompClient.subscribe('/topic/answer', function (answer) {
+            $("#answer").append("<tr><td>" + answer.body + "</td></tr>");
         });
         stompClient.subscribe('/queue/error', function (message) {
             $("#error").append("<tr><td>" + message.body + "</td></tr>");

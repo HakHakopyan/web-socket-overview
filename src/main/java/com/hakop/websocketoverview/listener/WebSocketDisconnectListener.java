@@ -16,6 +16,6 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
     @Override
     @EventListener
     public void onApplicationEvent(SessionDisconnectEvent event) {
-        socketCache.remove(event.getSessionId());
+        socketCache.removeBySessionId(event.getSessionId());
     }
 }

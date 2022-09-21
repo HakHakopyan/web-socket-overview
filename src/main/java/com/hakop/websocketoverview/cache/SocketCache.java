@@ -2,32 +2,42 @@ package com.hakop.websocketoverview.cache;
 
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class SocketCache {
 
-    private final Map<String, List<String>> socketSessionIdToUserNamesMap = new ConcurrentHashMap<>();
+    // Username is uniq and cannot be registered across different sessions
+    private final Map<String, String> uniqUserNameToSocketSessionIdMap = new ConcurrentHashMap<>();
 
-    public boolean add(String sessionId, String userName) {
-        List<String> names = socketSessionIdToUserNamesMap.getOrDefault(sessionId, Collections.emptyList());
-        if (names.isEmpty()) {
-            names = Collections.synchronizedList(new ArrayList<>());
-            socketSessionIdToUserNamesMap.put(sessionId, names);
+    public void add(String sessionId, String userName) throws IllegalArgumentException {
+        String registeredSessionId = uniqUserNameToSocketSessionIdMap.get(userName);
+        if (registeredSessionId != null) {
+            throw new IllegalArgumentException(String.format("User '%s' already registered in %s session.",
+                    userName,
+                    registeredSessionId.equals(sessionId) ? "this" : "other")
+            );
         }
-        if (names.contains(userName)) {
-            return false;
-        }
-        names.add(userName);
-        return true;
+        uniqUserNameToSocketSessionIdMap.put(userName, sessionId);
     }
 
-    public void remove(String sessionId) {
-        socketSessionIdToUserNamesMap.remove(sessionId);
+    public boolean removeByUserName(String userName) {
+        String registeredSessionId = uniqUserNameToSocketSessionIdMap.get(userName);
+        uniqUserNameToSocketSessionIdMap.remove(userName);
+        return registeredSessionId != null;
+    }
+
+    public void removeBySessionId(String sessionId) {
+        Optional<String> keyToRemove = uniqUserNameToSocketSessionIdMap.entrySet().stream()
+                .filter(userToSesId -> userToSesId.getValue().equals(sessionId))
+                .map(Map.Entry::getKey)
+                .findFirst();
+
+
+
+        keyToRemove.ifPresent(uniqUserNameToSocketSessionIdMap::remove);
     }
 }
 

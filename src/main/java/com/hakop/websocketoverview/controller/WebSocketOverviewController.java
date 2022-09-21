@@ -3,6 +3,8 @@ package com.hakop.websocketoverview.controller;
 import com.hakop.websocketoverview.cache.SocketCache;
 import com.hakop.websocketoverview.model.RegInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -14,8 +16,11 @@ import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.support.AbstractHandshakeHandler;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -50,6 +55,9 @@ public class WebSocketOverviewController {
         return exception.getMessage();
     }
 
+    /**
+     * {@link AbstractHandshakeHandler#doHandshake(ServerHttpRequest, ServerHttpResponse, WebSocketHandler, Map)}
+     */
     @PostMapping("/result")
     public String result(@RequestParam("user_name") final String userName, @RequestParam("result") final boolean result) {
         String sessionId = socketCache.getSessionId(userName);

@@ -32,7 +32,7 @@ function connect() {
         stompClient.subscribe('/queue/process', function (regProcessInfo) {
             showRegProcessInfo(regProcessInfo.body);
         });
-        stompClient.subscribe('/topic/answer', function (answer) {
+        stompClient.subscribe('/user/topic/answer', function (answer) {
             $("#answer").append("<tr><td>" + answer.body + "</td></tr>");
         });
         stompClient.subscribe('/queue/error', function (message) {

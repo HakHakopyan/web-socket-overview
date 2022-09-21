@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @RestController
 public class WebSocketOverviewController {
@@ -49,12 +52,16 @@ public class WebSocketOverviewController {
 
     @PostMapping("/result")
     public String result(@RequestParam("user_name") final String userName, @RequestParam("result") final boolean result) {
-        msTemplate.convertAndSend("/topic/answer", String.format("%s your registration result is: %s",
-                userName,
-                result ? "success" : "denied"
-        ));
-        return socketCache.removeByUserName(userName)
-                ? "User success notified."
-                : "Such user not registered";
+        String sessionId = socketCache.getSessionId(userName);
+        if (sessionId == null) {
+            return "Such user not registered";
+        }
+        msTemplate.convertAndSendToUser(
+                UUID.randomUUID().toString(),
+                "/topic/answer",
+                String.format("%s your registration result is: %s", userName, result ? "success" : "denied"),
+                Collections.singletonMap("simpSessionId", sessionId)
+        );
+        return "User success notified.";
     }
 }

@@ -23,6 +23,10 @@ public class SocketCache {
         uniqUserNameToSocketSessionIdMap.put(userName, sessionId);
     }
 
+    public String getSessionId(String userName) {
+        return uniqUserNameToSocketSessionIdMap.get(userName);
+    }
+
     public boolean removeByUserName(String userName) {
         String registeredSessionId = uniqUserNameToSocketSessionIdMap.get(userName);
         uniqUserNameToSocketSessionIdMap.remove(userName);

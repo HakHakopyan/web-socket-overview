@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +32,7 @@ public class WebSocketOverviewController {
     }
 
     @MessageMapping("register/body")
-    @SendTo("/topic/process")
+    @SendToUser("/topic/process")
     public String registerInBody(@Payload RegInfo regInfo, @Header("simpSessionId") String sessionId, Principal user) {
         socketCache.add(sessionId, regInfo.name(), user.getName());
         return String.format("%s you are registered by 'body' in session %s.", regInfo.name(), sessionId);
@@ -45,7 +46,7 @@ public class WebSocketOverviewController {
     }
 
     @MessageExceptionHandler
-    @SendTo("/queue/error")
+    @SendToUser("/queue/error")
     public String handleException(Throwable exception) {
         return exception.getMessage();
     }

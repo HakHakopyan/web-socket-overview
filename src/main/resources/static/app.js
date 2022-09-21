@@ -26,7 +26,7 @@ function connect() {
 
         stompClient.subscribe('/app/ping', function (response) {});
 
-        stompClient.subscribe('/topic/process', function (regProcessInfo) {
+        stompClient.subscribe('/user/topic/process', function (regProcessInfo) {
             showRegProcessInfo(regProcessInfo.body);
         });
         stompClient.subscribe('/queue/process', function (regProcessInfo) {
@@ -35,7 +35,7 @@ function connect() {
         stompClient.subscribe('/user/topic/answer', function (answer) {
             $("#answer").append("<tr><td>" + answer.body + "</td></tr>");
         });
-        stompClient.subscribe('/queue/error', function (message) {
+        stompClient.subscribe('/user/queue/error', function (message) {
             $("#error").append("<tr><td>" + message.body + "</td></tr>");
         });
     });
